@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bridging fairness</title>
+  <style>
+    body {font-family:Arial,sans-serif;margin:0;padding:0;background:#eee;color:#1f1f1f;display:flex;justify-content:center;align-items:top;height:100vh;font-size:24px;}
+    .slide {display:none;text-align:center;padding:40px;width:1200px;box-sizing:border-box;}
+    .active {display:block;animation:fadeIn 0.5s ease-in-out;}
+    h1 {font-size:52px;margin:0.5em 0;}
+    h2 {font-size:32px;margin:0.5em 0;}
+    .presenter{color:#1b7ab1}
+    p {font-size:28px;text-align:left;}
+    .sub {font-size:24px;color:#888;}
+    .venue {color:#CC2;}
+    .high {color: #1b7ab1;}
+    .footer {text-align:center;font-size:28px;color:#888;}
+    .controls {position:fixed;bottom:30px;width:100%;display:flex;justify-content:center;align-items:center;gap:20px;}
+    .slide-number {font-size:26px;color:#888;}
+    button {padding:10px 10px;font-size:28px;background:#444;color:#eee;border:none;border-radius:10px;cursor:pointer;max-height:70px;}
+    button:hover {background:#666;}
+    @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+    a {color:#58F;}
+    .console {color:#EEE;background-color:#444;text-align:left;padding:24px;}
+    .boxed {display:inline-block;;font-weight:600;font-size:0.95em;margin:2px 4px;}
+    .boxed-blue  { color:#1b7ab1; }
+    .boxed-red   { color:rgb(151, 20, 20); }
+    .boxed-green { color:#6c6; }
+    .boxed-gold  { color:rgb(148, 103, 5); }
+  </style>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" />
+  <script>window.MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]},svg: {fontCache: 'global'}};</script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"> async</script>
+</head>
+<body><div id="slides">
+  <!-- START PRESENTATION -->
+
+  <div class="slide">
+    <br><br><br><br><br><br><br><br>
+    <h1>Bridging the gap between epistemic and context-specific views of AI fairness</h1>
+    <br><br>
+    <h2><span class="presenter">Emmanouil Krasanakis (maniospas@iti.gr)</span>, Symeon Papadopoulos</h2>
+    
+  </div>
+
+
+  <div class="slide">
+    <h1>The fairness gap</h1>
+    <br>
+    <p><span>Technical</span> view<br><span class="sub">• Define biases: 80% rule, disparate mistreatment, differential fairness, etc<br>• Mitigation on a case-by-case basis<br>• Power imbalance: has the final say!</span>
+    <p style="margin-left:80px"><span class="boxed boxed-red">concern</span> → <span class="boxed boxed-blue">numeric bias vs accuracy</span> → <span class="boxed boxed-blue">optimize</span></p>
+    <br>
+    <p><span>Social</span> view<br><span class="sub">Checklists, human-in-the-loop, recourse, etc</span></p>
+    <p style="margin-left:80px"><span class="boxed boxed-red">concern</span> → <span class="boxed boxed-gold">account for real context</span> → <span class="boxed boxed-gold">processes</span></p>
+  </div>
+
+  <div class="slide">
+    <h1>Ignoramus et ignorabimus</h1>
+    <br>
+    <br>
+    <p>How to <span class="boxed boxed-blue">optimize</span> while integrating social <span class="boxed boxed-gold">processes</span>?</p>
+    <p>Trying to overcome impossibility theorems for satisfying multiple notions of fairness,<br>but hoping for epistemic solutions to unsolvable problems is not new.</p>
+    <p class="sub">
+      <i>"In opposition to the foolish ignorabimus our slogan shall be [...] (We must know – we will know)."</i>
+    </p>
+    <p class="sub" style="text-align:right">- Hilbert, one year before Gödel's incompleteness theorems</p>
+    <br><br>
+
+
+  </div>
+  <div class="slide">
+    <h1>A simpler question</h1>
+    <br>
+    <br>
+    <p>How to <span class="boxed boxed-blue">compute bias</span> while accounting for <span class="boxed boxed-gold">real context</span>?</p>
+    <p>• Leave optimization to a case-by-case basis.<br>• Also needs to be supplemented by other processes.</p>
+    <p>Still tough!</p>
+  </div>
+
+  <div class="slide">
+    <h1>Proposed framework</h1>
+    <br>
+    <p>Domain experts write fairness definitions in logical systems of <b>non-binary truth values</b>.</p>
+    <p class="sub"><b>Example:</b> probabilities $P(A\cap B) = P(A)\cdot P(B)$ for disjoint $A,B$</p>
+
+    <div style="display:flex; justify-content:center; gap:20px; margin-top:50px">
+      <div style="padding:20px; width:50%; border-radius:10px; border:1px solid #1f1f1f;">
+        <p>Convert to <span class="boxed boxed-blue">semi-structured</span> <span class="boxed boxed-gold">text</span></p>
+        <p class="sub"><b>Example:</b><br>&nbsp;&nbsp;&nbsp;bias MEANS NOT interesting<br>&nbsp;&nbsp;&nbsp;interesting MEANS A AND B</p>
+         <p>• Abstract terms A,B, "interesting", "bias"
+        <br>• Starting point of social engagement
+        <br>• Stakeholders <span class="boxed boxed-gold">agree</span> on meaning</p>
+      </div>
+      
+      <div style="padding:20px; width:50%; border-radius:10px; border:1px solid #1f1f1f;">
+        <p>Equivalent <span class="boxed boxed-blue">numeric formulas</span></p>
+        <p class="sub"><b>Equivalent example:</b><br>&nbsp;&nbsp;&nbsp;$P(bias) = 1-P(interesting)$<br>&nbsp;&nbsp;&nbsp;$P(interesting) = P(A)\cdot P(B)$</p>
+        <p>• Terms are abstract statements
+        <br>• Questionnaires & interviews gather truth values on <span class="boxed boxed-gold">opinions</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="slide">
+    <h1>Probabilities?</h1>
+    <br>
+      <p>Need to statistically measure reality</p>
+      <p>Causality $\neq$ implication</p>
+      <p>No transparency<br><span class="sub">consider $|P(hired|man)-P(hired|woman)|\leq 0.1$ <br>• what does $0.1$="small" even mean?<br>• how would that change if we changed country or compared other groups?</span></p>
+      <p>No thresholds (popular: apply arbitrary thresholds)<br><span class="sub">obvious but <span style="color: #f66;">insufficient</span> $P(A\Rightarrow B)=P(\neg (A \cap \neg B))=...=1-P(A)(1-P(B|A))$</span></p>
+  </div>
+
+
+  
+  <div class="slide">
+    <h1>Option: fuzzy logics</h1>
+    <br>
+      <p>Several variations</p>
+      <p>Depend on how to define conjunction</p>
+      <p>• $a=μ(A) =$ truth value of A
+        <br>• $a \Rightarrow b=μ(A\text{ IMPLIES }B)$
+        <br>• $a \star b=μ(A\text{ AND }B)$ <span class="sub">for independent A,B (actually called conjunction instead of AND)</span></p>
+      <div style="display:flex; justify-content:center; gap:20px; margin-top:50px;">
+        <div style="padding:20px; width:30%; border-radius:10px; border:1px solid #1f1f1f;">
+          <h2 class="high">Gödel logic</h2>
+          <p>Models worst case</p>
+          <p class="sub">$a\star b = \min(a, b)$</p>
+          <p class="sub">$a\Rightarrow b=
+            \begin{cases}
+              1 & \text{if } a \le b \\
+              b & \text{otherwise}
+            \end{cases}$</p>
+        </div>
+        <div style="padding:20px; width:30%; border-radius:10px; border:1px solid #1f1f1f;">
+          <h2 class="high">Product logic</span></h2>
+          <p>Models probabilities</p>
+          <p class="sub">$a\star b = a \cdot b$</p>
+          <p class="sub">$a\Rightarrow b=
+            \begin{cases}
+              1 & \text{if } a \le b \\
+              \frac{b}{a} & \text{otherwise}
+            \end{cases}$</p>
+        </div>
+        <div style="padding:20px; width:30%; border-radius:10px; border:1px solid #1f1f1f;">
+          <h2 class="high">Łukasiewicz logic</h2>
+          <p>Models predicate logic</p>
+          <p class="sub">$a\star b = \max(0, a + b - 1)$</p>
+          <p class="sub">$a\Rightarrow b=\min(1, 1 - a + b)$<br>&nbsp;</p>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  <div class="slide">
+    <h1>Fuzzy logics</h1>
+    <br>
+      <p>Different degradation of truth values.<br>Assumption: discrimination opposes indistinguishibility between groups.</p>
+      <p class="sub">discrimination <code style="font-size:0.8em">E(A,B) MEANS OPPOSITION TO indistinguishibility(A,B)
+indistinguishibility(A,B) MEANS (A IMPLIES B) AND (B IMPLIES A)</code></p>
+      <div style="display:flex; justify-content:center; gap:20px; margin-top:50px;">
+        <div style="padding:20px; width:30%; border-radius:10px; border:1px solid #1f1f1f;">
+          <h2 class="high">Gödel logic</h2>
+            <p>$0.5 \Rightarrow 0.3=0.3$</p>
+            <p>$μ(E)=1-\min(a,b)$</p>
+        </div>
+        <div style="padding:20px; width:30%; border-radius:10px; border:1px solid #1f1f1f;">
+          <h2 class="high">Product logic</h2>
+            <p>$0.5 \Rightarrow 0.3=0.6$</p>
+            <p>$μ(E)=1-\min(\tfrac{a}{b},\tfrac{b}{a})$</p>
+        </div>
+        <div style="padding:20px; width:30%; border-radius:10px; border:1px solid #1f1f1f;">
+          <h2 class="high">Łukasiewicz logic</h2>
+            <p>$0.5 \Rightarrow 0.3=0.8$</p>
+            <p>$μ(E)=|a-b|$</p>
+        </div>
+      </div>
+      <p>• Choose a different logic for each thresholding strategy!<br>
+        • Thresholds = added assumptions to logic definitions!</p>
+    </div>
+    
+
+
+  <div class="slide">
+    <h1>Case study</h1>
+    <br>
+
+      <img src="https://mammoth-ai.eu/wp-content/uploads/2022/09/mammoth.svg" alt="MAMMOth logo" style="height:60px;"><br>
+      <a href="https://mammoth-ai.eu/project/">https://mammoth-ai.eu/project/</a>
+      <p>Stakeholders to help us choose fairness definition through a co-creation process.</p>
+      <p><b>Q: If you could choose, would you prioritize non-discrimination or correctness?<br>A: options 1-5 (3=equally important)</b></p>
+      <p class="sub">bias = discrimination $\star μ(Tol → (E → Err))$</p>
+      <p class="sub">$μ(Tol)=\max{0,1-0.5(avg(Q)-1)}$</p>
+      
+      <p>TODO</p>
+  </div>
+
+  
+
+  <div class="slide">
+    <h1>Thank you for your attention!</h1>
+    <br>
+      <p>TODO</p>
+  </div>
+  
+  <!-- COMMON FOOTER -->
+
+  </div><div class="controls">
+
+
+  
+      <img src="https://mever.gr/media/logo_hu_2a1492e4ae64356a.png" alt="MEVer logo" style="height:30px;">
+      <img src="https://mammoth-ai.eu/wp-content/uploads/2022/09/mammoth.svg" alt="MAMMOth logo" style="height:25px;">
+      <img src="https://us-previewenginepublic.nimbuspop.com/image/BACKSTAGE/148470000000621063?cli-msg=eyJtb2R1bGUiOiJFdmVudEltYWdlUmVzb3VyY2UiLCJ0eXBlIjowLCJwb3J0YWxJZCI6Ijg3NDA4NTM5NCIsInN1YlJlc291cmNlSWQiOiI4NzQwODUzOTQiLCJpZCI6IjE0ODQ3MDAwMDAwMDYyMTA2MyJ9" alt="EU project logo" style="height:50px;">
+    
+    
+    <button id="prevBtn">&lt;</button>
+    <div class="footer" id="footerTemplate">
+      <span class="sub"><div class="slide-number" id="slideNumber"></div></span>
+    </div>
+    <button id="nextBtn">&gt;</button>
+  </div>
+
+
+
+  <!-- END PRESENTATION -->
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideNumber = document.getElementById('slideNumber');
+    function showSlide(n) {
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === n));
+      prevBtn.style.visibility = n === 0 ? 'hidden' : 'visible';
+      nextBtn.style.visibility = n === total - 1 ? 'hidden' : 'visible';
+      slideNumber.textContent = `Slide ${n + 1} / ${total}`;
+      MathJax.typesetPromise(); // refresh LaTeX
+    }
+    prevBtn.onclick = () => { if (current > 0) showSlide(--current); };
+    nextBtn.onclick = () => { if (current < total - 1) showSlide(++current); };
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') nextBtn.click();
+      if (e.key === 'ArrowLeft') prevBtn.click();
+    });
+    showSlide(current);
+  </script>
+
+</body>
+</html>

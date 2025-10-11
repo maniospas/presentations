@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smol Presentation - maniospas</title>
+  <style>
+    body {font-family: Arial, sans-serif; margin:0; padding:0; background:#1F1F1F; color:#eee; display:flex; justify-content:center; align-items:top; height:100vh; font-size:24px;}
+    .slide {display:none; text-align:center; padding:40px; width:80%; max-width:1024px; box-sizing:border-box;}
+    #slide1 {margin-top:15%; }
+    .active {display:block; animation:fadeIn 0.5s ease-in-out;}
+    h1 {font-size:98px; margin:0.5em 0;}
+    h2 {font-size:48px; margin:0.5em 0;}
+    p {font-size:32px; text-align:left;}
+    .sub {font-size:24px;color:#888;}
+    .venue {color:#CC2;}
+    .footer {text-align:center;font-size:32px;}
+    .controls {position:fixed; bottom:30px; width:100%; display:flex; justify-content:center; gap:40px;}
+    .console {color:#EEE;background-color:#444;text-align:left;padding:24px;}
+    button {padding:20px 40px; font-size:28px; background:#444; color:#eee; border:none; border-radius:10px; cursor:pointer; margin-top:3px;max-height:70px;}
+    button:hover {background:#666;}
+    @keyframes fadeIn {from{opacity:0;} to{opacity:1;}}
+    a {color:#58F;}
+  </style>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Slide -->
+  <div class="slide active" id="slide1">
+    <h1>Finite Smoλ Types</h1>
+    <h2>by maniospas</h2>
+  </div>
+
+  <!-- Slide -->
+  <div class="slide" id="slide2">
+    <h1>Type systems</h1>
+    <br>
+    <br>
+    <p>✅ Expressive</p>
+    <p>✅ Reliable <span class="sub">"if it compiles it runs"</span></p>
+    <p>✅ Safe <code class="language-smolambda">if result.err.bool() |return false</code></p>
+    <br>
+    <br>
+    <p>❌ All this power ... is also risky</p><!--
+    <p style="margin-left:50px;" class="sub">Turing complete types: <a href="https://www.youtube.com/watch?v=0mCsluv5FXA">Doom in TS</a>, humans also can't solve the <a href="https://en.wikipedia.org/wiki/Halting_problem">halting problem</a></p>
+    <p style="margin-left:50px;" class="sub">Harder maintenance: implicitness, overengineering, excessive math</p>-->
+    <p style="margin-left:50px;" class="sub">code is implicit & overengineered, understanding types becomes a <a href="https://en.wikipedia.org/wiki/Halting_problem">halting problem</a></p>
+
+  </div>
+
+  <!-- Slide -->
+  <div class="slide" id="slide3">
+    <h1>Proposal</h1>
+    <br>
+    <br>
+    <p>Decideable types/normalization (e.g., no recursion)</b></p>
+    <p>For same expressiveness if we read the whole code:</p>
+    <p>&nbsp;&nbsp;&nbsp;<span style="color:#CC2;">@compile</span> add types for unknown states<p/>
+    <p>&nbsp;&nbsp;&nbsp;<span style="color:#CC2;">@runtime</span> fail unconstrained type checks not met<p/>
+    <p style="margin-left:50px;" class="sub">e.g., <i>is_prime</i> encodes that we made a check, proof assistants help design</p>
+
+  </div>
+
+
+  <!-- Slide -->
+  <div class="slide" id="slide4">
+    <h1>Smoλ's types</h1>
+    <br>
+    <br>
+    <p><span style="color:#A44;">ZFC-inf</span> has K-finite sets ⇒ <a href="https://projecteuclid.org/journals/notre-dame-journal-of-formal-logic/volume-19/issue-1/On-the-consistency-and-independence-of-some-set-theoretical-axioms/10.1305/ndjfl/1093888220.pdf">complete</a>, <a href="https://dl.acm.org/doi/abs/10.1145/3167085">decideable in HoTT</a></p>
+    <p style="margin-left:50px;" class="sub">don't care about ∞ on finite computers, extensionality and replacement are trivial</p>
+    <p>
+<!--    &nbsp;&nbsp;&nbsp;<span style="color:#A44;width:200px;display: inline-block;">extensionality</span> ⇐ structural typing+names<br>
+    &nbsp;&nbsp;&nbsp;<span style="color:#A44;width:200px;display: inline-block;">replacement</span> ⇐ functions results are types = sets<br>-->
+    &nbsp;&nbsp;&nbsp;<span style="color:#A44;width:200px;display: inline-block;">regularity</span> ⇐ access only previous defs<br>
+    &nbsp;&nbsp;&nbsp;<span style="color:#A44;width:200px;display: inline-block;">choice</span> ⇐ unique meaning of type names in functions<br>
+    &nbsp;&nbsp;&nbsp;<span style="color:#A44;">pairing &amp; specification:</span>
+    <pre><code class="language-smolambda">union Data  = Type1 or Type2 // pairing
+union Value = Type2 or Type3
+def prop(Data)               // theorem: ∀d∈Data ∃prop(d)
+
+def func(Value value)
+    with value.prop()        // specification: only Type2∈Value
+    ...</code></pre>
+  </div>
+
+  <!-- Slide -->
+  <div class="slide" id="slide5">
+    <h1>Example</h1>
+    <br>
+    <br>
+    <pre><code class="language-smolambda">@include std.core  // for arithmetics
+
+def Point(f64 x, f64 y, f64 z) return @args
+def Field(Point starts, Point ends) return @args
+union Highdim = Point or Field
+
+// overloads allowed
+def stretch(Point p)
+    return Point(p.x*2,0, p.y*2.0, p.z*2.0)
+
+def stretch(Field f)
+    return Field(...)
+
+// polymorphism expands to all variations
+def superstretch(Highdim object)
+    return object.stretch().stretch()</code></pre>
+  </div>
+
+  <!-- Slide -->
+  <div class="slide" id="slide6">
+    <h1>Dynamic dispatch</h1>
+    <p>At runtime, the halting problem is a tautology!!!</p>
+    <p style="margin-left:50px;" class="sub">we directly observe if the program stopped</p>
+    <p>Trampolines (interpreter-like loops to choose what runs next) encode unconstrained logic and re-enter the type system</p>
+    <p style="margin-left:50px;" class="sub">with function pointers, vtables, etc... or smoλ tags</p>
+    <pre><code class="language-smolambda">@include std.core
+
+def state(tag func, u64 n) return @args
+def ping(u64 n) print("ping") return :pong.state(n)
+def pong(u64 n) print("pong") return :ping.state(n-1)
+
+service main()
+    @mut T = ping(4) // mutable state
+    while T.n.bool()
+        T = @dynamic(ping,pong) T() //call by tag name</code></pre>
+  </div>
+
+  <!-- Slide -->
+  <div class="slide" id="slide7">
+    <h1>No proof = error</h1>
+    <p>Robust handling (e.g., no leaks, no use after free)</p>
+    <pre><code class="language-smolambda">@include std.core
+
+def state(tag func, u64 a)   return @args
+service test(state T, u64 b) return @dynamic(add) T(b)
+
+service main()
+    result = :unknown.State(1).test(2) // failed to use :add
+    if state.err.bool().not()
+        then print("Something went wrong")
+    print("Bye!")
+</code></pre>
+  </div>
+
+  <!-- Slide -->
+  <div class="slide" id="slide7">
+    <h1>Benefits</h1>
+    <p>Split type checking between compilation and runtime.</p>
+    <p>Random benefits in smoλ</p>
+    <p>inline previous defs for performance</p>
+    <p>reason about stack limits</p>
+    <p style="margin-left:50px;" class="sub">preemptively fail and <strong>recover</strong> from exceeding stack limits</p>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button id="prevBtn" onclick="prevSlide()">Previous</button>
+    <div class="footer">
+        <span class="venue"><em>PL Lightning Talks</em></span><br>
+        <span class="sub">December, 2025</span>
+    </div>
+    <button id="nextBtn" onclick="nextSlide()">Next</button>
+  </div>
+
+
+
+
+  <!-- Scripts -->
+
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+
+  <script>
+    Prism.languages.smolambda = {
+    'comment': /\/\/.*/,
+    'directive': {
+        pattern: /@\w+/,
+        alias: 'important'
+    },
+    'constant': {
+        pattern: /:\w+/,
+        alias: 'important'
+    },
+    'keyword': [
+        {
+        pattern: /\b(?:def|service|if|elif|else|return|with|include|do|while|then|union|to|upto|lento|len|and|or|end|on)\b/,
+        greedy: true
+        },
+        {
+        // operators like ".", "|", ":"
+        pattern: /(\.|\||:)/,
+        greedy: true
+        }
+    ],
+    'special-amp': {
+        pattern: /&/,
+        alias: 'operator'
+    },
+    'builtin': /\b(?:i64|u64|f64|ptr|cstr|nstr|str|buffer|main|copy|bool|not|cos|sin|tan|acos|asin|atan|pi|exp|log|pow|sqrt|add|mul|sub|div|nominal|tag)\b/,
+    'punctuation': /[{}();,\[\]]/,
+    'number': /\b\d+(?:\.\d+)?\b/,
+    'string': {
+        pattern: /"(?:\\.|[^"\\])*"/,
+        greedy: true
+    }
+    };
+    </script>
+
+
+  <script>
+    let current = 1;
+    const total = 7;
+
+    function showSlide(n) {
+        for (let i = 1; i <= total; i++) {
+        document.getElementById('slide' + i).classList.remove('active');
+        }
+        document.getElementById('slide' + n).classList.add('active');
+        document.getElementById('prevBtn').style.visibility = (n === 1) ? 'hidden' : 'visible';
+        document.getElementById('nextBtn').style.visibility = (n === total) ? 'hidden' : 'visible';
+    }
+
+    function prevSlide() {
+        current = (current - 1 < 1) ? 1 : current - 1;
+        showSlide(current);
+    }
+
+    function nextSlide() {
+        current = (current + 1 > total) ? total : current + 1;
+        showSlide(current);
+    }
+
+    // Initialize button visibility
+    showSlide(current);
+    </script>
+
+
+</body>
+</html>
