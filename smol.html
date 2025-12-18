@@ -35,10 +35,9 @@
   <div class="slide" id="slide2">
     <h1>Type systems</h1>
     <br>
-    <br>
     <p>✅ Expressive</p>
     <p>✅ Reliable <span class="sub">"if it compiles it runs"</span></p>
-    <p>✅ Safe <code class="language-smolambda">if result.err.bool() |return false</code></p>
+    <p>✅ Safe <code class="language-smolambda">if result.err.bool() return false</code></p>
     <br>
     <br>
     <p>❌ All this power ... is also risky</p><!--
@@ -50,14 +49,13 @@
 
   <!-- Slide -->
   <div class="slide" id="slide3">
-    <h1>Proposal</h1>
-    <br>
+    <h1>Keep it simple!</h1>
     <br>
     <p>Decideable types/normalization (e.g., no recursion)</b></p>
     <p>For same expressiveness if we read the whole code:</p>
-    <p>&nbsp;&nbsp;&nbsp;<span style="color:#CC2;">@compile</span> add types for unknown states<p/>
-    <p>&nbsp;&nbsp;&nbsp;<span style="color:#CC2;">@runtime</span> fail unconstrained type checks not met<p/>
-    <p style="margin-left:50px;" class="sub">e.g., <i>is_prime</i> encodes that we made a check, proof assistants help design</p>
+    <p>&nbsp;&nbsp;&nbsp;<span style="color:#CC2;">on compile</span> add types for unknown states<p/>
+    <p>&nbsp;&nbsp;&nbsp;<span style="color:#CC2;">at runtime</span> unconstrained type checks that may fail<p/>
+    <p style="margin-left:50px;" class="sub">e.g., <i>is_prime</i> encodes that we made a check</p>
 
   </div>
 
@@ -65,7 +63,6 @@
   <!-- Slide -->
   <div class="slide" id="slide4">
     <h1>Smoλ's types</h1>
-    <br>
     <br>
     <p><span style="color:#A44;">ZFC-inf</span> has K-finite sets ⇒ <a href="https://projecteuclid.org/journals/notre-dame-journal-of-formal-logic/volume-19/issue-1/On-the-consistency-and-independence-of-some-set-theoretical-axioms/10.1305/ndjfl/1093888220.pdf">complete</a>, <a href="https://dl.acm.org/doi/abs/10.1145/3167085">decideable in HoTT</a></p>
     <p style="margin-left:50px;" class="sub">don't care about ∞ on finite computers, extensionality and replacement are trivial</p>
@@ -77,33 +74,30 @@
     &nbsp;&nbsp;&nbsp;<span style="color:#A44;">pairing &amp; specification:</span>
     <pre><code class="language-smolambda">union Data  = Type1 or Type2 // pairing
 union Value = Type2 or Type3
-def prop(Data)               // theorem: ∀d∈Data ∃prop(d)
-
+def property(Data)           // theorem: ∀d∈Data property(d)
 def func(Value value)
-    with value.prop()        // specification: only Type2∈Value
-    ...</code></pre>
+    case value.prop()        // only if Type2∈Value at compile
+        ...</code></pre>
   </div>
 
   <!-- Slide -->
   <div class="slide" id="slide5">
     <h1>Example</h1>
     <br>
-    <br>
-    <pre><code class="language-smolambda">@include std.core  // for arithmetics
+    <pre><code class="language-smolambda">@include std.core // for arithmetics
 
-def Point(f64 x, f64 y, f64 z) return @args
-def Field(Point starts, Point ends) return @args
+def Point(f64 x, f64 y, f64 z)
+    return @args // x,y,z
+def Field(Point starts, Point ends)
+    return @args
 union Highdim = Point or Field
 
-// overloads allowed
 def stretch(Point p)
     return Point(p.x*2,0, p.y*2.0, p.z*2.0)
-
-def stretch(Field f)
+def stretch(Field f) // overloads allowed
     return Field(...)
 
-// polymorphism expands to all variations
-def superstretch(Highdim object)
+def superstretch(Highdim object) // polymorphism
     return object.stretch().stretch()</code></pre>
   </div>
 
@@ -111,14 +105,17 @@ def superstretch(Highdim object)
   <div class="slide" id="slide6">
     <h1>Dynamic dispatch</h1>
     <p>At runtime, the halting problem is a tautology!!!</p>
-    <p style="margin-left:50px;" class="sub">we directly observe if the program stopped</p>
-    <p>Trampolines (interpreter-like loops to choose what runs next) encode unconstrained logic and re-enter the type system</p>
-    <p style="margin-left:50px;" class="sub">with function pointers, vtables, etc... or smoλ tags</p>
+    <p>Trampolines: check dynamic dispatch and re-enter correctness</p>
     <pre><code class="language-smolambda">@include std.core
 
-def state(tag func, u64 n) return @args
-def ping(u64 n) print("ping") return :pong.state(n)
-def pong(u64 n) print("pong") return :ping.state(n-1)
+def state(tag func, u64 n)
+    return @args
+def ping(u64 n)
+    print("ping")
+    return :pong.state(n)
+def pong(u64 n)
+    print("pong")
+    return :ping.state(n-1)
 
 service main()
     @mut T = ping(4) // mutable state
@@ -130,15 +127,18 @@ service main()
   <div class="slide" id="slide7">
     <h1>No proof = error</h1>
     <p>Robust handling (e.g., no leaks, no use after free)</p>
-    <pre><code class="language-smolambda">@include std.core
+    <pre><code class="language-smolambda">@include std.core // includes add(u64 a, u64 b)
 
-def state(tag func, u64 a)   return @args
-service test(state T, u64 b) return @dynamic(add) T(b)
+def state(tag func, u64 a)
+    return @args
+
+service test(state T, u64 b)
+    return @dynamic(add) T(b)
 
 service main()
-    result = :unknown.State(1).test(2) // failed to use :add
-    if state.err.bool().not()
-        then print("Something went wrong")
+    result = :unknown.State(1).test(2) // should have used :add
+    if result.err.bool().not() // error handling service return
+        print("Something went wrong")
     print("Bye!")
 </code></pre>
   </div>
@@ -183,7 +183,7 @@ service main()
     },
     'keyword': [
         {
-        pattern: /\b(?:def|service|if|elif|else|return|with|include|do|while|then|union|to|upto|lento|len|and|or|end|on)\b/,
+        pattern: /\b(?:def|service|if|elif|else|return|with|include|do|while|then|union|to|upto|lento|len|and|or|end|on|case|qed)\b/,
         greedy: true
         },
         {
